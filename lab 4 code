@@ -1,2 +1,46 @@
 #include <xc.h>
 #pragma config FNOSC = LPFRC;
+
+int main(void)
+{
+    _RCDIV = 0b000;
+
+    OC2CON = 0;
+    OC2CON2 = 0;
+    OC2CONbits.OCTSEL = 0b111;
+    OC2CONbits.SYNCSEL = 0b11111;
+    OC2CON2bits.OCTRIG = 0;
+    OC2RS = 3999; //period
+    OC2R = OC2RS; //duty cycle
+
+    double i = 0;
+    unsigned int getBrighter = 1;
+    double maxBrightness = 10000;
+
+    // Configure PWM
+    // Select timing source, self-synchronization, synchronization instead
+    // of trigger mode, and edge-aligned mode
+    // Also specify PWM period and initial duty cycle, if that makes sense
+    // for your approach
+    
+    // Configure Timer1
+
+
+    while(1)
+    {   OC2R = OC2RS  * (i/maxBrightness)
+        if (getBrighter){
+            i++;
+            if (i>maxBrightness){
+                getBrighter = 0;
+                }
+        }
+        else{
+            i--;
+                if (i<0){
+                    getBrighter = 1;
+                    }
+        }
+    }
+
+    return 0;
+}
