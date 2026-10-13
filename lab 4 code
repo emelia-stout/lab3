@@ -13,32 +13,15 @@ int main(void)
     OC2RS = 3999; //period
     OC2R = OC2RS; //duty cycle
 
-    double i = 0;
-    unsigned int getBrighter = 1;
-    double maxBrightness = 10000;
-
-    // Configure PWM
-    // Select timing source, self-synchronization, synchronization instead
-    // of trigger mode, and edge-aligned mode
-    // Also specify PWM period and initial duty cycle, if that makes sense
-    // for your approach
-    
-    // Configure Timer1
-
 
     while(1)
-    {   OC2R = OC2RS  * (i/maxBrightness)
-        if (getBrighter){
-            i++;
-            if (i>maxBrightness){
-                getBrighter = 0;
+    { 
+        if (_RB0 = 1){
+            OC2R = OC2RS/2;
                 }
         }
         else{
-            i--;
-                if (i<0){
-                    getBrighter = 1;
-                    }
+            OC2R = OC2RS;
         }
     }
 
