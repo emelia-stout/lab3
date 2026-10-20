@@ -1,0 +1,112 @@
+#include "xc.h"
+#pragma config ICS = PGx3 
+#pragma config FNOSC = LPRC 
+
+int count = 0; //a global variable I want to increment in my counter interrupt 
+void __attribute__((interrupt, no_auto_psv)) _OC1Interrupt(void){ 
+    _OC1IF = 0; //clears interrupt flag 
+    count++;
+} 
+
+enum{OFF, START, STATE1, STATE2, STATE3} state;
+
+int main(void) {
+    OC1CON1 = 0; 
+    OC1CON2 = 0; 
+    LATA = 0; 
+    LATB = 0; 
+    TRISA = 0; 
+    TRISB = 0; 
+    ANSA = 0; 
+    ANSB = 0; 
+    OC1CON1=0x1C06;
+    OC1CON2=0x001F;
+    _TRISB7=1;
+    OC1RS = 38;
+    OC1R = 19;
+    _OC1IP = 4; //sets the OC1 counter interrupt priority to 4 
+    _OC1IF = 0; //clears the OC1 counter interrupt flag 
+    _OC1IE = 1; //enables the OC1 counter interrupt 
+    _TON=0;
+    _TCS=0;
+    _TCKPS=0b11;
+    PR1 = 60;
+
+    state = OFF;
+    
+    while(1)
+    {
+        switch(state){
+            case OFF:
+                if(_RB7==0){
+                    OC1R=0;
+                }
+                
+                else if(_RB7==1){
+                    count = 0;
+                    OC1RS=78;
+                    OC1R=38;
+                    state=START;
+                  
+                }
+                break;
+            
+            case START:
+                if(count>1000){
+                    _LATA0=!_LATA0;
+                    TMR1=0;
+                    
+                    _TON=1;
+                    
+                    OC1RS=155;
+                    OC1R=78;
+                    
+                    count = 0;
+                    state=STATE1;
+                }
+                else if(_RB7==0){
+                    OC1R=0;
+                    state=OFF;
+                }
+                break;
+
+            case STATE1:
+                if(TMR1==303){
+                    _TON=0;
+                    _LATA0=!_LATA0;
+                    OC1RS=78;
+                    OC1R=38;
+                    count=0;
+                    state=STATE2;
+                }
+                else if(_RB7==0){
+                    OC1R=0;
+                    state=OFF;
+                }
+                break;
+
+            case STATE2:
+                if(count>600){
+                    OC1RS=19;
+                    OC1R=9;
+                    count=0;
+                    state=STATE3;
+                }
+                else if(_RB7==0){
+                    OC1R=0;
+                    state=OFF;
+                }
+                break;
+                
+
+            case STATE3:
+                if(_RB7==0){
+                    OC1R=0;
+                    state=OFF;
+                }
+                break;
+        }
+    
+    return 0;
+}
+}
