@@ -30,7 +30,7 @@ int main(void) {
     _TON=0;
     _TCS=0;
     _TCKPS=0b11;
-    PR1 = 60;
+    PR1 = 303;
 
     state = OFF;
     
@@ -46,6 +46,7 @@ int main(void) {
                     count = 0;
                     OC1RS=78;
                     OC1R=38;
+                    OC1TMR=0;
                     state=START;
                   
                 }
@@ -55,12 +56,11 @@ int main(void) {
                 if(count>1000){
                     _LATA0=!_LATA0;
                     TMR1=0;
-                    
+                    _T1IF=0;
                     _TON=1;
-                    
                     OC1RS=155;
                     OC1R=78;
-                    
+                    OC1TMR=0;
                     count = 0;
                     state=STATE1;
                 }
@@ -71,16 +71,19 @@ int main(void) {
                 break;
 
             case STATE1:
-                if(TMR1==303){
+                if(_T1IF){
                     _TON=0;
+                    _T1IF=0;
                     _LATA0=!_LATA0;
                     OC1RS=78;
                     OC1R=38;
+                    OC1TMR=0;
                     count=0;
                     state=STATE2;
                 }
                 else if(_RB7==0){
                     OC1R=0;
+                    _TON=0;
                     state=OFF;
                 }
                 break;
@@ -89,6 +92,7 @@ int main(void) {
                 if(count>600){
                     OC1RS=19;
                     OC1R=9;
+                    OC1TMR=0;
                     count=0;
                     state=STATE3;
                 }
@@ -106,7 +110,6 @@ int main(void) {
                 }
                 break;
         }
-    
+    }
     return 0;
-}
 }
